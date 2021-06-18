@@ -309,11 +309,17 @@ Else
 	GUICtrlCreateMenuItem('移除该右键菜单', $MCheckBox1)
 	GUICtrlSetOnEvent(-1, 'RemoveRegTweak1')
 EndIf
-$Checkbox[2] = _GUICtrlCreateCheckbox("右键添加CAB相关命令", 8, 160, 145, 17)
-GUICtrlSetTip(-1, '在右键添加包含"Cab最大压缩"和"Cab解压缩"子菜单的"CAB文件' & @LF & '工具"菜单,如果你有操作类似svcpack.in_文件的需要，请选中。')
+If @OSBuild > 19040 Then
+	$Checkbox[2] = _GUICtrlCreateCheckbox("恢复经典系统属性", 8, 160, 145, 17)
+	GUICtrlSetTip(-1, 'windows 10 20h1及后续版本恢复经典系统属性')
+Else
+	$Checkbox[2] = _GUICtrlCreateCheckbox("右键添加CAB相关命令", 8, 160, 145, 17)
+	GUICtrlSetTip(-1, '在右键添加包含"Cab最大压缩"和"Cab解压缩"子菜单的"CAB文件' & @LF & '工具"菜单,如果你有操作类似svcpack.in_文件的需要，请选中。')
+EndIf
 $MCheckBox2 = GUICtrlCreateContextMenu($Checkbox[2])
 GUICtrlCreateMenuItem('移除该右键菜单', $MCheckBox2)
 GUICtrlSetOnEvent(-1, 'RemoveRegTweak2')
+
 $Checkbox[3] = _GUICtrlCreateCheckbox("右键快速打开CMD", 8, 184, 129, 17)
 GUICtrlSetTip(-1, '在右键快速打开命令提示符，懒得cd来cd去了！推荐选择。')
 $MCheckBox3 = GUICtrlCreateContextMenu($Checkbox[3])
@@ -1561,20 +1567,27 @@ Func AddRegTweaks()
 		EndIf
 		$n += 1
 	EndIf
-	;2右键添加CAB相关命令
+	;
 	If GUICtrlRead($Checkbox[2]) = $GUI_CHECKED Then
-		If @OSBuild > 6000 Then
-			Local $Icostr = _WinAPI_AssocQueryString('.cab', $ASSOCSTR_DEFAULTICON)
-			RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\CABCmpress', '', 'REG_SZ', 'CAB最大压缩')
-			RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\CABCmpress\command', '', 'REG_SZ', 'makecab /v3 /D CompressionType=LZX /D CompressionMemory=21 "%1"')
-			RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\CABExpand', '', 'REG_SZ', '解压缩 CAB 文件')
-			RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\CABExpand\command', '', 'REG_SZ', 'expand -r "%1"')
-			RegWrite('HKEY_CLASSES_ROOT\*\shell\CABMenu', 'MUIVerb', 'REG_SZ', 'CAB文件工具')
-			RegWrite('HKEY_CLASSES_ROOT\*\shell\CABMenu', 'icon', 'REG_SZ', $Icostr)
-			RegWrite('HKEY_CLASSES_ROOT\*\shell\CABMenu', 'SubCommands', 'REG_SZ', 'CABCmpress;CABExpand')
+		If @OSBuild > 19040 Then
+			;恢复经典系统属性界面
+			RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SYSTEM\ControlSet001\Control\FeatureManagement\Overrides\0\2093230218', 'EnabledState', 'REG_DWORD', '00000001')
 		Else
-			RegWrite('HKEY_CLASSES_ROOT\*\shell\CAB最大压缩\command', '', 'REG_SZ', 'makecab /v3 /D CompressionType=LZX /D CompressionMemory=21 \"%1\"')
-			RegWrite('HKEY_CLASSES_ROOT\*\shell\解压缩 CAB 文件\command', '', 'REG_SZ', 'expand -r \"%1\"')
+			;2右键添加CAB相关命令
+			If @OSBuild > 6000 Then
+				Local $Icostr = _WinAPI_AssocQueryString('.cab', $ASSOCSTR_DEFAULTICON)
+				RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\CABCmpress', '', 'REG_SZ', 'CAB最大压缩')
+				RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\CABCmpress\command', '', 'REG_SZ', 'makecab /v3 /D CompressionType=LZX /D CompressionMemory=21 "%1"')
+				RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\CABExpand', '', 'REG_SZ', '解压缩 CAB 文件')
+				RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\CABExpand\command', '', 'REG_SZ', 'expand -r "%1"')
+				RegWrite('HKEY_CLASSES_ROOT\*\shell\CABMenu', 'MUIVerb', 'REG_SZ', 'CAB文件工具')
+				RegWrite('HKEY_CLASSES_ROOT\*\shell\CABMenu', 'icon', 'REG_SZ', $Icostr)
+				RegWrite('HKEY_CLASSES_ROOT\*\shell\CABMenu', 'SubCommands', 'REG_SZ', 'CABCmpress;CABExpand')
+
+			Else
+				RegWrite('HKEY_CLASSES_ROOT\*\shell\CAB最大压缩\command', '', 'REG_SZ', 'makecab /v3 /D CompressionType=LZX /D CompressionMemory=21 \"%1\"')
+				RegWrite('HKEY_CLASSES_ROOT\*\shell\解压缩 CAB 文件\command', '', 'REG_SZ', 'expand -r \"%1\"')
+			EndIf
 		EndIf
 		$n += 1
 	EndIf
@@ -2196,17 +2209,25 @@ Func RemoveRegTweak1()
 	MsgBox(0, '提示', '移除右键"管理员取得所有权"菜单成功！', 5)
 EndFunc   ;==>RemoveRegTweak1
 Func RemoveRegTweak2()
-	;删除cab最大压缩
-	If @OSBuild > 6000 Then
-		RegDelete('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\CABCmpress')
-		RegDelete('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\CABExpand')
-		RegDelete('HKEY_CLASSES_ROOT\*\shell\CABMenu')
+	If @OSBuild > 19040 Then
+		;恢复新版系统属性界面
+		RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SYSTEM\ControlSet001\Control\FeatureManagement\Overrides\0\2093230218','EnabledState','REG_DWORD', '00000002')
+		_ForceUpdate()
+		MsgBox(0, '提示', '恢复默认系统属性界面成功', 5)
 	Else
-		RegDelete('HKEY_CLASSES_ROOT\*\shell\CAB最大压缩')
-		RegDelete('HKEY_CLASSES_ROOT\*\shell\解压缩 CAB 文件')
+		;删除cab最大压缩
+		If @OSBuild > 6000 Then
+			RegDelete('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\CABCmpress')
+			RegDelete('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\CommandStore\shell\CABExpand')
+			RegDelete('HKEY_CLASSES_ROOT\*\shell\CABMenu')
+		Else
+			RegDelete('HKEY_CLASSES_ROOT\*\shell\CAB最大压缩')
+			RegDelete('HKEY_CLASSES_ROOT\*\shell\解压缩 CAB 文件')
+		EndIf
+		_ForceUpdate()
+		MsgBox(0, '提示', '移除CAB相关菜单成功', 5)
 	EndIf
-	_ForceUpdate()
-	MsgBox(0, '提示', '移除CAB相关菜单成功', 5)
+
 EndFunc   ;==>RemoveRegTweak2
 Func RemoveRegTweak3()
 	;删除在此处打开命令提示符
