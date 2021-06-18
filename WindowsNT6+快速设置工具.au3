@@ -6,7 +6,7 @@
 #PRE_Compile_Both=y
 #PRE_Res_Comment=Windows NT6+ 快速设置工具 By 虫子樱桃
 #PRE_Res_Description=Windows NT6+ 快速设置工具By 虫子樱桃
-#PRE_Res_Fileversion=1.8.0.61
+#PRE_Res_Fileversion=1.8.0.62
 #PRE_Res_Fileversion_AutoIncrement=y
 #PRE_Res_LegalCopyright=虫子樱桃
 #PRE_Res_Language=2052
