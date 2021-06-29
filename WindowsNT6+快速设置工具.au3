@@ -6,7 +6,7 @@
 #PRE_Compile_Both=y
 #PRE_Res_Comment=Windows NT6+ 快速设置工具 By 虫子樱桃
 #PRE_Res_Description=Windows NT6+ 快速设置工具By 虫子樱桃
-#PRE_Res_Fileversion=1.8.0.62
+#PRE_Res_Fileversion=1.8.0.63
 #PRE_Res_Fileversion_AutoIncrement=y
 #PRE_Res_LegalCopyright=虫子樱桃
 #PRE_Res_Language=2052
@@ -421,11 +421,19 @@ $Checkbox[13] = _GUICtrlCreateCheckbox("优化系统显示设置", 216, 232, 145
 GUICtrlSetTip(-1, '优化显示效果。')
 If @OSBuild > 6000 Then
 	If @OSBuild > 8000 Then
-		$Checkbox[14] = _GUICtrlCreateCheckbox('去除属性界面"以前的版本"标签页', 216, 256, 185, 17)
-		GUICtrlSetTip(-1, '勾选此选项，可去除属性界面"以前的版本"标签页', '提示', 1)
-		$MCheckBox14 = GUICtrlCreateContextMenu($Checkbox[14])
-		GUICtrlCreateMenuItem('还原属性界面"以前的版本"标签页', $MCheckBox14)
-		GUICtrlSetOnEvent(-1, 'RemoveRegTweak14')
+		If @OSBuild > 21990 Then
+			$Checkbox[14] = _GUICtrlCreateCheckbox('跳过TPM和安全启动检查', 216, 256, 185, 17)
+			GUICtrlSetTip(-1, '勾选此选项，跳过TPM和安全启动检查，使老系统也可以安装或更新windows11', '提示', 1)
+			$MCheckBox14 = GUICtrlCreateContextMenu($Checkbox[14])
+			GUICtrlCreateMenuItem('还原还原系统默认设置', $MCheckBox14)
+			GUICtrlSetOnEvent(-1, 'RemoveRegTweak14')
+		Else
+			$Checkbox[14] = _GUICtrlCreateCheckbox('去除属性界面"以前的版本"标签页', 216, 256, 185, 17)
+			GUICtrlSetTip(-1, '勾选此选项，可去除属性界面"以前的版本"标签页', '提示', 1)
+			$MCheckBox14 = GUICtrlCreateContextMenu($Checkbox[14])
+			GUICtrlCreateMenuItem('还原属性界面"以前的版本"标签页', $MCheckBox14)
+			GUICtrlSetOnEvent(-1, 'RemoveRegTweak14')
+		EndIf
 	Else
 		$Checkbox[14] = _GUICtrlCreateCheckbox('右键添加"窗口转换程序"', 216, 256, 185, 17)
 		GUICtrlSetTip(-1, '勾选此选项，可以在右键添加' & @LF & '"窗口转换程序"菜单', '提示', 1)
@@ -1735,7 +1743,12 @@ Func AddRegTweaks()
 	If GUICtrlRead($Checkbox[14]) = $GUI_CHECKED Then
 		If @OSBuild > 6000 Then
 			If @OSBuild > 8000 Then
-				RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer', 'NoPreviousVersionsPage', 'REG_DWORD', '00000001')
+				If @OSBuild > 21990 Then
+					RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SYSTEM\Setup\LabConfig', 'BypassTPMCheck', 'REG_DWORD', '00000001')
+					RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SYSTEM\Setup\LabConfig', 'BypassSecureBootCheck', 'REG_DWORD', '00000001')
+				Else
+					RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer', 'NoPreviousVersionsPage', 'REG_DWORD', '00000001')
+				EndIf
 			Else
 				RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWAR\Classes\Directory\Background\shellex\ContextMenuHandlers\Flip3D', '', 'REG_SZ', '{3080F90E-D7AD-11D9-BD98-0000947B0257}')
 			EndIf
@@ -2211,7 +2224,7 @@ EndFunc   ;==>RemoveRegTweak1
 Func RemoveRegTweak2()
 	If @OSBuild > 19040 Then
 		;恢复新版系统属性界面
-		RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SYSTEM\ControlSet001\Control\FeatureManagement\Overrides\0\2093230218','EnabledState','REG_DWORD', '00000002')
+		RegWrite('HKEY_LOCAL_MACHINE' & $OSFlag & '\SYSTEM\ControlSet001\Control\FeatureManagement\Overrides\0\2093230218', 'EnabledState', 'REG_DWORD', '00000002')
 		_ForceUpdate()
 		MsgBox(0, '提示', '恢复默认系统属性界面成功', 5)
 	Else
@@ -2342,8 +2355,13 @@ EndFunc   ;==>RemoveRegTweak12_1
 Func RemoveRegTweak14()
 	If @OSBuild > 6000 Then
 		If @OSBuild > 8000 Then
-			RegDelete('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer', 'NoPreviousVersionsPage')
-			MsgBox(0, '提示', '恢复属性界面"以前的版本"标签页成功！', 5)
+			If @OSBuild > 21990 Then
+				RegDelete('HKEY_LOCAL_MACHINE' & $OSFlag & '\SYSTEM\Setup\LabConfig')
+				MsgBox(0, '提示', '恢复系统默认设置成功！', 5)
+			Else
+				RegDelete('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer', 'NoPreviousVersionsPage')
+				MsgBox(0, '提示', '恢复属性界面"以前的版本"标签页成功！', 5)
+			EndIf
 		Else
 			RegDelete('HKEY_LOCAL_MACHINE' & $OSFlag & '\SOFTWARE\Classes\Directory\Background\shellex\ContextMenuHandlers\Flip3D')
 			MsgBox(0, '提示', '移除右键菜单成功！', 5)

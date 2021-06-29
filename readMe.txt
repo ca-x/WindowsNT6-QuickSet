@@ -1,5 +1,9 @@
 
 (按最新版本排列)
+
+<font color='green'><b>★★★1.8.0.63版★★★</b></font>
+适配windows11
+
 <font color='purple'><b>★★★1.8.0.59版★★★</b></font>
 替换KMS VL ALL为HWIDGen
 
