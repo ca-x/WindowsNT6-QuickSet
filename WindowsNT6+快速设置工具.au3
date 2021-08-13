@@ -74,14 +74,13 @@ If _Singleton(@ScriptName, 1) = 0 Then
 EndIf
 ;解决win8.1下模拟SYSTEM用户运行的问题所用函数需用变量
 Const $ERROR_INVALID_SID = 1337
-Global Const $ERROR_INVALID_FUNCTION = 0x1
-DllCall("Kernel32.dll", "dword", "GetFirmwareEnvironmentVariableW", "wstr", "", "wstr", '{00000000-0000-0000-0000-000000000000}', "wstr", Null, "dword", 0)
-If _WinAPI_GetLastError() = $ERROR_INVALID_FUNCTION Then
-	_BIOSbmp(True, @TempDir)
-	$iBootType = @TempDir & '\BIOS.bmp'
-Else
+If IsUEFIBoot() Then
 	_UEFIbmp(True, @TempDir)
 	$iBootType = @TempDir & '\UEFI.bmp'
+Else
+
+	_BIOSbmp(True, @TempDir)
+	$iBootType = @TempDir & '\BIOS.bmp'
 EndIf
 
 Global Const $tagSTARTUPINFO1 = "dword cb;ptr lpReserved;ptr lpDesktop;ptr lpTitle;dword dwX;dword dwY;dword dwXSize;dword dwYSize;" & _
@@ -11494,6 +11493,34 @@ Func _SetDefaultFileName()
 	EndIf
 EndFunc   ;==>_SetDefaultFileName
 
+Func IsUEFIBoot()
+	Local Const $ERROR_INVALID_FUNCTION = 0x1
+	Local $hDLL = DllOpen("Kernel32.dll")
+	If @OSBuild > 8000 Then
+		Local $aCall = DllCall($hDLL, "int", "GetFirmwareType", "int*", 0)
+		DllClose($hDLL)
+		If Not @error And $aCall[0] Then
+			Switch $aCall[1]
+				; 1 - bios 2- uefi 3-unknown
+				Case 2
+					Return True
+				Case Else
+					Return False
+			EndSwitch
+		EndIf
+		Return False
+
+
+	Else
+		DllCall($hDLL, "dword", "GetFirmwareEnvironmentVariableW", "wstr", "", "wstr", '{00000000-0000-0000-0000-000000000000}', "wstr", Null, "dword", 0)
+		DllClose($hDLL)
+		If _WinAPI_GetLastError() = $ERROR_INVALID_FUNCTION Then
+			Return False
+		Else
+			Return True
+		EndIf
+	EndIf
+EndFunc   ;==>IsUEFIBoot
 Func CheckUpdate()
 	Local $version = ""
 	$data = InetRead($UerHome, 1)
