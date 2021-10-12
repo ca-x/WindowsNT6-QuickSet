@@ -7950,7 +7950,7 @@ Func _Rainymood()
 	GUICtrlCreateObj($oWMP, 0, 0, 133, 181)
 	AdlibRegister("SetWMPStaus")
 	Global $WMPStatus = GUICtrlCreateLabel('', 1, 181, 133, 17)
-	$oWMP.URL = "http://rainymood.com/audio1110/0.m4a"
+	$oWMP.URL = "http://rainymood.com/audio1112/0.m4a"
 	$oWMP.controls.play()
 	$oWMP.stretchToFit = True
 	$oWMP.windowlessVideo = True
