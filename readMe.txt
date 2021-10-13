@@ -1,6 +1,10 @@
 
 (按最新版本排列)
 
+<font color='orange'><b>★★★1.8.0.64版★★★</b></font>
+添加NCSI服务器（windows检查网络连通性）配置
+Windows 11 右键菜单风格切换
+
 <font color='green'><b>★★★1.8.0.63版★★★</b></font>
 适配windows11
 

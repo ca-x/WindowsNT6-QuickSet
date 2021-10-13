@@ -6,7 +6,7 @@
 #PRE_Compile_Both=y
 #PRE_Res_Comment=Windows NT6+ 快速设置工具 By 虫子樱桃
 #PRE_Res_Description=Windows NT6+ 快速设置工具By 虫子樱桃
-#PRE_Res_Fileversion=1.8.0.63
+#PRE_Res_Fileversion=1.8.0.64
 #PRE_Res_Fileversion_AutoIncrement=y
 #PRE_Res_LegalCopyright=虫子樱桃
 #PRE_Res_Language=2052
@@ -218,6 +218,10 @@ If @OSBuild > 6000 Then
 	TrayCreateItem('MkLink GUI实用工具', $SysUseTool)
 	TrayItemSetOnEvent(-1, 'MkLinkGUI')
 EndIf
+If @OSBuild >= 2200 Then
+	TrayCreateItem('Windows 11 右键菜单切换', $SysUseTool)
+	TrayItemSetOnEvent(-1, 'Win11RightMenuToogleUI')
+EndIf
 TrayCreateItem('SYSTEM用户执行操作模拟', $UerAccTool)
 TrayItemSetOnEvent(-1, 'GuiSYSCMD')
 TrayCreateItem('修改新建默认文件名', $SysUseTool)
@@ -227,6 +231,8 @@ If @OSVersion = "WIN_81" Or @OSVersion = "WIN_10" Or @OSVersion = "WIN_2012" Or 
 	TrayItemSetOnEvent(-1, 'ExplorerDirManager')
 	TrayCreateItem('Win+X 选项设置', $SysUseTool)
 	TrayItemSetOnEvent(-1, 'FormWinX')
+	TrayCreateItem('Windows NCSI服务器设置', $SysUseTool)
+	TrayItemSetOnEvent(-1, 'NCSIServerUI')
 	TrayCreateItem('Windows8.1+.NET Framework3.5安装工具', $SysUseTool)
 	TrayItemSetOnEvent(-1, 'InstallNetFrame35UI')
 	TrayCreateItem('释放Windows8.1更新缓存', $SysUseTool)
@@ -8759,6 +8765,87 @@ Func W81DirTweak()
 		MsgBox(0, '提示', '所选设定已经成功应用到当前系统', 5)
 	EndIf
 EndFunc   ;==>W81DirTweak
+
+
+Func NCSIServerUI()
+	Global $FormNCSIServerForm = _GUICreate("windows NCSI服务器设置", 351, 123, 121, 100, -1, BitOR($WS_EX_TOOLWINDOW, $WS_EX_WINDOWEDGE, $WS_EX_MDICHILD), $Form1)
+	GUICtrlCreateGroup("选择NCSI服务器", 16, 8, 273, 65)
+	_removeEffect()
+	Global $OptMicroSoft = GUICtrlCreateRadio("microsoft", 32, 32, 65, 17)
+	GUICtrlSetState(-1, $GUI_CHECKED)
+	Global $OptDebian = GUICtrlCreateRadio("debian", 120, 32, 65, 17)
+	Global $OptFirefox = GUICtrlCreateRadio("firefox", 208, 32, 65, 17)
+	GUICtrlCreateButton("设置NCSI服务器", 48, 80, 211, 25)
+	GUICtrlSetOnEvent(-1, 'ApplyNCSISetting')
+	GUICtrlSetColor(-1, 0xFFFFFF)
+	GUICtrlSetBkColor(-1, $aGroupBkcolor[$ibkcolor])
+	GUICtrlCreateGroup("", -99, -99, 1, 1)
+	GUISetState(@SW_SHOW)
+	GUISetOnEvent($GUI_EVENT_CLOSE, 'QuitNCSIUI')
+EndFunc   ;==>NCSIServerUI
+
+Func ApplyNCSISetting()
+	If GUICtrlRead($OptMicroSoft) = $GUI_CHECKED Then
+		microsoftNCSI()
+	EndIf
+	If GUICtrlRead($OptDebian) = $GUI_CHECKED Then
+		debianNCSI()
+	EndIf
+	If GUICtrlRead($OptFirefox) = $GUI_CHECKED Then
+		firefoxNCSI()
+	EndIf
+
+EndFunc   ;==>ApplyNCSISetting
+
+Func debianNCSI()
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveDnsProbeContent", "REG_SZ", "208.67.222.222")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveDnsProbeContentV6", "REG_SZ", "2620:119:35::35")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveDnsProbeHost", "REG_SZ", "resolver1.opendns.com")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveDnsProbeHostV6", "REG_SZ", "resolver1.opendns.com")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbeContent", "REG_SZ", "NetworkManager is online")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbeContentV6", "REG_SZ", "NetworkManager is online")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbeHost", "REG_SZ", "network-test.debian.org")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbeHostV6", "REG_SZ", "network-test.debian.org")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbePath", "REG_SZ", "nm")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbePathV6", "REG_SZ", "nm")
+	MsgBox(0, '提示', '所选Debian NCSI设置已经成功应用到当前系统', 5)
+EndFunc   ;==>debianNCSI
+
+Func microsoftNCSI()
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveDnsProbeContent", "REG_SZ", "131.107.255.255")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveDnsProbeContentV6", "REG_SZ", "fd3e:4f5a:5b81::1")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveDnsProbeHost", "REG_SZ", "dns.msftncsi.com")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveDnsProbeHostV6", "REG_SZ", "dns.msftncsi.com")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbeContent", "REG_SZ", "Microsoft Connect Test")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbeContentV6", "REG_SZ", "Microsoft Connect Test")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbeHost", "REG_SZ", "www.msftconnecttest.com")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbeHostV6", "REG_SZ", "ipv6.msftconnecttest.com")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbePath", "REG_SZ", "connecttest.txt")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbePathV6", "REG_SZ", "connecttest.txt")
+	MsgBox(0, '提示', '所选Microsoft NCSI设置已经成功应用到当前系统', 5)
+EndFunc   ;==>microsoftNCSI
+
+Func firefoxNCSI()
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveDnsProbeContent", "REG_SZ", "208.67.222.222")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveDnsProbeContentV6", "REG_SZ", "2620:119:35::35")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveDnsProbeHost", "REG_SZ", "resolver1.opendns.com")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveDnsProbeHostV6", "REG_SZ", "resolver1.opendns.com")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbeContent", "REG_SZ", "success")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbeContentV6", "REG_SZ", "success")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbeHost", "REG_SZ", "detectportal.firefox.com")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbeHostV6", "REG_SZ", "detectportal.firefox.com")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbePath", "REG_SZ", "success.txt")
+	RegWrite("HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\NlaSvc\Parameters\Internet", "ActiveWebProbePathV6", "REG_SZ", "success.txt")
+	MsgBox(0, '提示', '所选Firefox NCSI设置已经成功应用到当前系统', 5)
+EndFunc   ;==>firefoxNCSI
+
+Func QuitNCSIUI()
+	_WinAPI_AnimateWindow($FormNCSIServerForm, BitOR($AW_BLEND, $AW_HIDE))
+	GUIDelete($OptMicroSoft)
+	GUIDelete($OptFirefox)
+	GUIDelete($OptDebian)
+EndFunc   ;==>QuitNCSIUI
+
 Func ReleseCacheUI()
 	Global $FormReleaseCache = _GUICreate("释放Windows8.1更新缓存", 380, 89, 121, 100, -1, BitOR($WS_EX_TOOLWINDOW, $WS_EX_WINDOWEDGE, $WS_EX_MDICHILD), $Form1)
 	Global $StartReleaseCache = GUICtrlCreateButton("一键释放更新缓存", 8, 56, 363, 25)
@@ -8801,6 +8888,7 @@ Func _NofierCacheDone()
 		MsgBox(0, '提示', '释放更新缓存操作完成！', 5, $FormReleaseCache)
 	EndIf
 EndFunc   ;==>_NofierCacheDone
+
 Func InstallNetFrame35UI()
 	Global $FormInsdotNet = _GUICreate("Windows8.1+.NET Framework3.5安装工具", 368, 109, 121, 100, -1, BitOR($WS_EX_TOOLWINDOW, $WS_EX_WINDOWEDGE, $WS_EX_MDICHILD), $Form1)
 	GUICtrlCreateGroup("选择Windows8.1+源安装盘", 8, 8, 353, 41)
@@ -8829,6 +8917,52 @@ Func QuitDotNetForm()
 	_WinAPI_AnimateWindow($FormInsdotNet, BitOR($AW_BLEND, $AW_HIDE))
 	GUIDelete($FormInsdotNet)
 EndFunc   ;==>QuitDotNetForm
+
+Func Win11RightMenuToogleUI()
+	Global $Win11RightMenuForm = _GUICreate("Windows 11 右键菜单风格切换", 307, 89, 121, 100, -1, BitOR($WS_EX_TOOLWINDOW, $WS_EX_WINDOWEDGE, $WS_EX_MDICHILD), $Form1)
+	GUICtrlCreateButton("windows11新版风格", 24, 16, 113, 33)
+	GUICtrlSetOnEvent(-1, 'windows11StyleRightMenu')
+	GUICtrlCreateButton("windows旧版风格", 140, 15, 97, 33)
+	GUICtrlSetOnEvent(-1, 'windowsOldStyleRightMenu')
+	GUISetState(@SW_SHOW)
+	GUISetOnEvent($GUI_EVENT_CLOSE, 'QuitWin11RightMenuForm')
+EndFunc   ;==>Win11RightMenuToogleUI
+
+Func windows11StyleRightMenu()
+	RegDelete('HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}')
+	RestartExplorer()
+	MsgBox(0, '提示', '设置右键菜单为windows11新版风格成功！', 5, $Win11RightMenuForm)
+EndFunc   ;==>windows11StyleRightMenu
+Func windowsOldStyleRightMenu()
+	RegWrite('HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32', '', "REG_SZ", "")
+	RestartExplorer()
+	MsgBox(0, '提示', '设置右键菜单为windows旧版本风格成功！', 5, $Win11RightMenuForm)
+EndFunc   ;==>windowsOldStyleRightMenu
+
+Func RestartExplorer()
+	Local $ifailure = 100, $zfailure = 100, $rPID = 0, $iExplorerPath = @WindowsDir & "\Explorer.exe"
+	_WinAPI_ShellChangeNotify($shcne_AssocChanged, 0, 0, 0) ; Save icon positions
+	Local $hSystray = _WinAPI_FindWindow("Shell_TrayWnd", "")
+	_SendMessage($hSystray, 1460, 0, 0) ; Close the Explorer shell gracefully
+	While ProcessExists("Explorer.exe") ; Try Close the Explorer
+		Sleep(10)
+		$ifailure -= ProcessClose("Explorer.exe") ? 0 : 1
+		If $ifailure < 1 Then Return SetError(1, 0, 0)
+	WEnd
+	While (Not ProcessExists("Explorer.exe")) ; Start the Explorer
+		If Not FileExists($iExplorerPath) Then Return SetError(-1, 0, 0)
+		Sleep(500)
+		$rPID = ShellExecute($iExplorerPath)
+		$zfailure -= $rPID ? 0 : 1
+		If $zfailure < 1 Then Return SetError(2, 0, 0)
+	WEnd
+	Return $rPID
+EndFunc   ;==>RestartExplorer
+
+Func QuitWin11RightMenuForm()
+	_WinAPI_AnimateWindow($Win11RightMenuForm, BitOR($AW_BLEND, $AW_HIDE))
+	GUIDelete($Win11RightMenuForm)
+EndFunc   ;==>QuitWin11RightMenuForm
 
 Func _DEVICECHANGE($hWnd, $Msg, $WParam, $LParam)
 	Switch $WParam
@@ -10618,6 +10752,8 @@ Func _MakeOnBmp($bSaveBinary = True, $sSavePath = @TempDir)
 	EndIf
 	Return $bString
 EndFunc   ;==>_MakeOnBmp
+
+
 Func _ScrollingCredits($sText, $iLeft, $iTop, $iWidth, $iHeight, $iSpeed = 100, $sTipText = '', $sFontFamily = '微软雅黑', $iDirection = 1, $fCenter = False, $iFontSize = 12)
 	Local $sCenterEnd = '', $sCenterStart = '', $sDirection = 'up'
 
