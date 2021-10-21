@@ -8931,10 +8931,10 @@ Func QuitDotNetForm()
 EndFunc   ;==>QuitDotNetForm
 
 Func Win11RightMenuToogleUI()
-	Global $Win11RightMenuForm = _GUICreate("Windows 11 右键菜单风格切换", 307, 89, 121, 100, -1, BitOR($WS_EX_TOOLWINDOW, $WS_EX_WINDOWEDGE, $WS_EX_MDICHILD), $Form1)
-	GUICtrlCreateButton("windows11新版风格", 24, 16, 113, 33)
+	Global $Win11RightMenuForm = _GUICreate("Windows 11 右键菜单风格切换", 270, 50, 121, 100, -1, BitOR($WS_EX_TOOLWINDOW, $WS_EX_WINDOWEDGE, $WS_EX_MDICHILD), $Form1)
+	GUICtrlCreateButton("windows11新版风格", 24, 5, 113, 33)
 	GUICtrlSetOnEvent(-1, 'windows11StyleRightMenu')
-	GUICtrlCreateButton("windows旧版风格", 140, 15, 97, 33)
+	GUICtrlCreateButton("windows旧版风格", 140, 5, 97, 33)
 	GUICtrlSetOnEvent(-1, 'windowsOldStyleRightMenu')
 	GUISetState(@SW_SHOW)
 	GUISetOnEvent($GUI_EVENT_CLOSE, 'QuitWin11RightMenuForm')
@@ -8942,11 +8942,13 @@ EndFunc   ;==>Win11RightMenuToogleUI
 
 Func windows11StyleRightMenu()
 	RegDelete('HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}')
+	_ForceUpdate()
 	RestartExplorer()
 	MsgBox(0, '提示', '设置右键菜单为windows11新版风格成功！', 5, $Win11RightMenuForm)
 EndFunc   ;==>windows11StyleRightMenu
 Func windowsOldStyleRightMenu()
 	RegWrite('HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32', '', "REG_SZ", "")
+	_ForceUpdate()
 	RestartExplorer()
 	MsgBox(0, '提示', '设置右键菜单为windows旧版本风格成功！', 5, $Win11RightMenuForm)
 EndFunc   ;==>windowsOldStyleRightMenu
