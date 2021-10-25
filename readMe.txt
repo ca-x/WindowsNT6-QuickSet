@@ -1,6 +1,9 @@
 
 (按最新版本排列)
 
+<font color='blue'><b>★★★1.8.0.65版★★★</b></font>
+添加预览版通道切换工具
+
 <font color='orange'><b>★★★1.8.0.64版★★★</b></font>
 添加NCSI服务器（windows检查网络连通性）配置
 Windows 11 右键菜单风格切换
