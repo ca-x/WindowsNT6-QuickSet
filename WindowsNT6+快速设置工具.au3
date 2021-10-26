@@ -6,7 +6,7 @@
 #PRE_Compile_Both=y
 #PRE_Res_Comment=Windows NT6+ 快速设置工具 By 虫子樱桃
 #PRE_Res_Description=Windows NT6+ 快速设置工具By 虫子樱桃
-#PRE_Res_Fileversion=1.8.0.66
+#PRE_Res_Fileversion=1.8.6.6
 #PRE_Res_Fileversion_AutoIncrement=y
 #PRE_Res_LegalCopyright=虫子樱桃
 #PRE_Res_Language=2052
@@ -11680,7 +11680,7 @@ Func CheckUpdate()
 	Local $version = ""
 	Local $b = InetRead("https://api.github.com/repos/czyt/WindowsNT6-QuickSet/releases/latest", 3)
 	Local $payload = BinaryToString($b, 4)
-	Local $aVersion = StringRegExp($payload, '"tag_name":"([^"]+)"', 1)
+	Local $aVersion = StringRegExp($payload, '"tag_name":"v([^"]+)"', 1)
 	Local $downloadUrl = StringRegExp($payload, '"browser_download_url":"([^"]+)"', 1)
 	If UBound($aVersion) > 0 Then
 		$version = $aVersion[0]
