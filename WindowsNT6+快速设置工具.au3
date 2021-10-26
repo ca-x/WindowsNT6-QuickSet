@@ -6,7 +6,7 @@
 #PRE_Compile_Both=y
 #PRE_Res_Comment=Windows NT6+ 快速设置工具 By 虫子樱桃
 #PRE_Res_Description=Windows NT6+ 快速设置工具By 虫子樱桃
-#PRE_Res_Fileversion=1.8.0.65
+#PRE_Res_Fileversion=1.8.0.66
 #PRE_Res_Fileversion_AutoIncrement=y
 #PRE_Res_LegalCopyright=虫子樱桃
 #PRE_Res_Language=2052
@@ -33,6 +33,7 @@
 #include <GuiIPAddress.au3>
 #include <GuiTab.au3>
 #include <GDIPlus.au3>
+#include <InetConstants.au3>
 #include <ListViewConstants.au3>
 #include <TreeViewConstants.au3>
 #include <StaticConstants.au3>
@@ -11677,20 +11678,33 @@ Func IsUEFIBoot()
 EndFunc   ;==>IsUEFIBoot
 Func CheckUpdate()
 	Local $version = ""
-	$data = InetRead($UerHome, 1)
-	Local $aSRE = StringRegExp(BinaryToString($data), 'id="nt6ver">(.+)</button>', 3)
-	If Not @error Then
-		$version = $aSRE[0]
+	Local $b = InetRead("https://api.github.com/repos/czyt/WindowsNT6-QuickSet/releases/latest", 3)
+	Local $payload = BinaryToString($b, 4)
+	Local $aVersion = StringRegExp($payload, '"tag_name":"([^"]+)"', 1)
+	Local $downloadUrl = StringRegExp($payload, '"browser_download_url":"([^"]+)"', 1)
+	If UBound($aVersion) > 0 Then
+		$version = $aVersion[0]
 	EndIf
 	If $version = $EXEVerson Then
 		MsgBox(0, '提示', '当前版本已经是最新！' & @LF & "官网:" & $version & "<->当前:" & $EXEVerson, 5)
 	ElseIf $version = "" Then
 		If MsgBox(4, '提示', '获取版本信息失败,是否立即前往官网？', 5) = 6 Then
-			ShellExecute($UerHome)
+			ShellExecute("https://github.com/czyt/WindowsNT6-QuickSet")
 		EndIf
 	ElseIf $version > $EXEVerson Then
-		If MsgBox(4, '提示', '发现官网新版本' & $version & ',是否立即前往官网？', 5) = 6 Then
-			ShellExecute($UerHome)
+		If UBound($downloadUrl) > 0 Then
+			If MsgBox(4, '提示', '发现官网新版本' & $version & ',是否下载到桌面？', 5) = 6 Then
+				Local $hDownload = InetGet("http://fastgit.czyt.tech/" & $downloadUrl[0], @DesktopDir & "\WindowsNT6+快速设置工具" & $version & ".7z", $INET_FORCERELOAD, $INET_DOWNLOADBACKGROUND)
+				Do
+					Sleep(250)
+				Until InetGetInfo($hDownload, $INET_DOWNLOADCOMPLETE)
+				InetClose($hDownload)
+				MsgBox(0, '提示', "最新版的程序已经放在您的桌面，请查收！")
+			EndIf
+		Else
+			If MsgBox(4, '提示', '发现官网新版本' & $version & ',是否立即前往官网？', 5) = 6 Then
+				ShellExecute("https://github.com/czyt/WindowsNT6-QuickSet")
+			EndIf
 		EndIf
 	Else
 		MsgBox(0, '提示', '您属于高级VIP用户，正在使用内部版本，请勿对外传播当前版本！！' & @LF & "官网:" & $version & "<->当前:" & $EXEVerson, 5)
@@ -12048,7 +12062,7 @@ Func InsiderSwitchUI()
 	Global $dev = GUICtrlCreateRadio("Dev通道", 40, 32, 113, 17)
 	Global $beta = GUICtrlCreateRadio("Beta通道", 40, 56, 97, 17)
 	Global $rp = GUICtrlCreateRadio("Release Preview通道", 40, 77, 129, 17)
-	GUICtrlSetState(-1,$GUI_CHECKED)
+	GUICtrlSetState(-1, $GUI_CHECKED)
 	Global $quitInsider = GUICtrlCreateRadio("停止接收预览版", 40, 102, 113, 17)
 	GUICtrlCreateGroup("", -99, -99, 1, 1)
 	GUICtrlCreateButton("应用选项", 200, 40, 105, 65)
