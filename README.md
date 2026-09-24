@@ -7,3 +7,29 @@
 
 ![image](https://user-images.githubusercontent.com/19337206/138220794-6551dd26-f748-4149-9ee1-13cb923e2955.png)
 
+## 源码结构
+
+原单文件脚本（1.2 万行）已按功能模块拆分，按系统版本分文件的实现也单独成目录：
+
+```
+WindowsNT6+快速设置工具.au3   入口/项目文件（编译目标，AccAu3Wrapper 指令保持原样）
+src\app\                      主流程（初始化 / 主窗口 / 消息循环，include 顺序敏感）
+src\core\                     通用基础库（工具、WinAPI、GUI、网络、内嵌资源）
+src\features\<功能域>\        功能模块，按功能域分目录
+                              net / system / shell / personalize / account / license / tools
+src\os\                       按系统版本的优化实现（Xp / Vista7 / Win8 / Win10 / Win11 / Server）
+src\file\                     运行时载荷（FileInstall 源）与本地 UDF
+src\img\                      图片与图标资源
+```
+
+模块职责、按系统版本分文件的对应关系、编译方法与维护注意事项见 [docs/模块结构.md](docs/模块结构.md)。
+
+### 编译
+
+用 AccAu3Wrapper_GUI 打开根目录的 `WindowsNT6+快速设置工具.au3` 直接编译即可（支持一键编译 x86/x64）；
+也可用 Aut2Exe：
+
+```bat
+Aut2exe.exe /in "WindowsNT6+快速设置工具.au3" /out "WindowsNT6+快速设置工具.exe" /x86
+Aut2exe.exe /in "WindowsNT6+快速设置工具.au3" /out "WindowsNT6+快速设置工具_x64.exe" /x64
+```
