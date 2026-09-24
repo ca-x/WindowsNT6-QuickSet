@@ -55,73 +55,73 @@
 #EndRegion ;**** 本地 UDF 与 AutoIt 标准库 ****
 
 #Region ;**** 通用基础库 src\core ****
-#include 'src\core\Core_Utils.au3'
-#include 'src\core\Core_WinAPI.au3'
-#include 'src\core\Core_Gui.au3'
-#include 'src\core\Core_Net.au3'
-#include 'src\core\Core_Assets.au3'
+#include 'src\core\utils.au3'
+#include 'src\core\win_api.au3'
+#include 'src\core\gui.au3'
+#include 'src\core\net.au3'
+#include 'src\core\assets.au3'
 #EndRegion ;**** 通用基础库 ****
 
 #Region ;**** 功能模块 src\features（按功能域分组） ****
 ; ---- 网络 ----
-#include 'src\features\net\Feat_NetTools.au3'
-#include 'src\features\net\Feat_IpSet.au3'
-#include 'src\features\net\Feat_MacChange.au3'
-#include 'src\features\net\Feat_WifiShare.au3'
-#include 'src\features\net\Feat_WOL.au3'
-#include 'src\features\net\Feat_NCSI.au3'
+#include 'src\features\net\net_tools.au3'
+#include 'src\features\net\ip_set.au3'
+#include 'src\features\net\mac_change.au3'
+#include 'src\features\net\wifi_share.au3'
+#include 'src\features\net\wol.au3'
+#include 'src\features\net\ncsi.au3'
 ; ---- 系统优化 ----
-#include 'src\features\system\Feat_RegTweaks.au3'
-#include 'src\features\system\Feat_Plugins.au3'
-#include 'src\features\system\Feat_Services.au3'
-#include 'src\features\system\Feat_SSD.au3'
-#include 'src\features\system\Feat_Security.au3'
-#include 'src\features\system\Feat_Cache.au3'
-#include 'src\features\system\Feat_ProcessBL.au3'
+#include 'src\features\system\reg_tweaks.au3'
+#include 'src\features\system\plugins.au3'
+#include 'src\features\system\services.au3'
+#include 'src\features\system\ssd.au3'
+#include 'src\features\system\security.au3'
+#include 'src\features\system\cache.au3'
+#include 'src\features\system\process_bl.au3'
 ; ---- 资源管理器与外壳 ----
-#include 'src\features\shell\Feat_ExplorerMenu.au3'
-#include 'src\features\shell\Feat_ShellTweaks.au3'
-#include 'src\features\shell\Feat_Share.au3'
-#include 'src\features\shell\Feat_DirTransfer.au3'
+#include 'src\features\shell\explorer_menu.au3'
+#include 'src\features\shell\shell_tweaks.au3'
+#include 'src\features\shell\share.au3'
+#include 'src\features\shell\dir_transfer.au3'
 ; ---- 个性化 ----
-#include 'src\features\personalize\Feat_OemInfo.au3'
-#include 'src\features\personalize\Feat_Wallpaper.au3'
-#include 'src\features\personalize\Feat_ScreenSaver.au3'
+#include 'src\features\personalize\oem_info.au3'
+#include 'src\features\personalize\wallpaper.au3'
+#include 'src\features\personalize\screen_saver.au3'
 ; ---- 账户与权限 ----
-#include 'src\features\account\Feat_UserAccount.au3'
-#include 'src\features\account\Feat_SysRun.au3'
+#include 'src\features\account\user_account.au3'
+#include 'src\features\account\sys_run.au3'
 ; ---- 激活与授权 ----
-#include 'src\features\license\Feat_Activation.au3'
+#include 'src\features\license\activation.au3'
 ; ---- 实用工具 ----
-#include 'src\features\tools\Feat_TrayTools.au3'
-#include 'src\features\tools\Feat_FileCreate.au3'
-#include 'src\features\tools\Feat_DotNet.au3'
-#include 'src\features\tools\Feat_History.au3'
-#include 'src\features\tools\Feat_Insider.au3'
-#include 'src\features\tools\Feat_MkLink.au3'
-#include 'src\features\tools\Feat_ForceDel.au3'
-#include 'src\features\tools\Feat_TPHotkey.au3'
+#include 'src\features\tools\tray_tools.au3'
+#include 'src\features\tools\file_create.au3'
+#include 'src\features\tools\dot_net.au3'
+#include 'src\features\tools\history.au3'
+#include 'src\features\tools\insider.au3'
+#include 'src\features\tools\mk_link.au3'
+#include 'src\features\tools\force_del.au3'
+#include 'src\features\tools\tp_hotkey.au3'
 #EndRegion ;**** 功能模块 ****
 
 #Region ;**** 按系统版本的实现 src\os ****
 ; Vista 及以后通用实现
-#include 'src\os\Os_Common.au3'
+#include 'src\os\common.au3'
 ; Windows XP / 2003
-#include 'src\os\Os_Xp.au3'
+#include 'src\os\xp.au3'
 ; Vista / Win7 / 2008R2
-#include 'src\os\Os_Vista7.au3'
+#include 'src\os\vista7.au3'
 ; Windows 8 / 8.1 / 2012
-#include 'src\os\Os_Win8.au3'
+#include 'src\os\win8.au3'
 ; Windows 10
-#include 'src\os\Os_Win10.au3'
+#include 'src\os\win10.au3'
 ; Windows 11
-#include 'src\os\Os_Win11.au3'
+#include 'src\os\win11.au3'
 ; Windows Server
-#include 'src\os\Os_Server.au3'
+#include 'src\os\server.au3'
 #EndRegion ;**** 按系统版本的实现 ****
 
 #Region ;**** 主流程（顺序敏感，勿调整） ****
-#include 'src\app\App_Init.au3'
-#include 'src\app\App_MainWindow.au3'
-#include 'src\app\App_MainLoop.au3'
+#include 'src\app\init.au3'
+#include 'src\app\main_window.au3'
+#include 'src\app\main_loop.au3'
 #EndRegion ;**** 主流程 ****

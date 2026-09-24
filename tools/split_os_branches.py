@@ -22,30 +22,30 @@ from collections import Counter
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 TARGETS = [
-    ('src/features/system/Feat_RegTweaks.au3', 'AddRegTweaks'),
-    ('src/features/system/Feat_Plugins.au3', 'pluginsTweaks'),
+    ('src/features/system/reg_tweaks.au3', 'AddRegTweaks'),
+    ('src/features/system/plugins.au3', 'pluginsTweaks'),
 ]
 
 # 整函数搬移：(源文件, 函数名, 目标版本标签)
 MOVE_FUNCS = [
-    ('src/features/system/Feat_Services.au3', 'Win08ServiceTweaks', 'Server'),
+    ('src/features/system/services.au3', 'Win08ServiceTweaks', 'Server'),
 ]
 
 # 各系统版本文件：(文件名, 标题, 说明)
 OS_FILES = {
-    'Xp': ('src/os/Os_Xp.au3', 'Windows XP / 2003',
+    'Xp': ('src/os/xp.au3', 'Windows XP / 2003',
            '适用于 @OSBuild < 6000 或 @OSVersion = WIN_XP / WIN_2003 的分支实现'),
-    'Common': ('src/os/Os_Common.au3', 'Vista 及以后通用实现',
+    'Common': ('src/os/common.au3', 'Vista 及以后通用实现',
                '适用于 @OSBuild > 6000 的通用分支，以及无法再细分的兜底分支'),
-    'Vista7': ('src/os/Os_Vista7.au3', 'Vista / Win7 / 2008R2',
+    'Vista7': ('src/os/vista7.au3', 'Vista / Win7 / 2008R2',
                '适用于 6000 < @OSBuild <= 8000 的分支实现'),
-    'Win8': ('src/os/Os_Win8.au3', 'Windows 8 / 8.1 / 2012',
+    'Win8': ('src/os/win8.au3', 'Windows 8 / 8.1 / 2012',
              '适用于 8000 < @OSBuild <= 10240，或 @OSVersion = WIN_8 / WIN_81 的分支实现'),
-    'Win10': ('src/os/Os_Win10.au3', 'Windows 10',
+    'Win10': ('src/os/win10.au3', 'Windows 10',
               '适用于 @OSBuild > 9000，或 @OSVersion = WIN_10 的分支实现'),
-    'Win11': ('src/os/Os_Win11.au3', 'Windows 11',
+    'Win11': ('src/os/win11.au3', 'Windows 11',
               '适用于 @OSBuild > 19040 / 21900 / 21990 的分支实现'),
-    'Server': ('src/os/Os_Server.au3', 'Windows Server',
+    'Server': ('src/os/server.au3', 'Windows Server',
                '适用于 @OSVersion = WIN_2003 / WIN_2008 / WIN_2008R2 的服务器版实现'),
 }
 

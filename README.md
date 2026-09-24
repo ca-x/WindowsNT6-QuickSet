@@ -14,14 +14,15 @@
 ```
 WindowsNT6+快速设置工具.au3   入口/项目文件（编译目标，AccAu3Wrapper 指令保持原样）
 src\app\                      主流程（初始化 / 主窗口 / 消息循环，include 顺序敏感）
-src\core\                     通用基础库（工具、WinAPI、GUI、网络、内嵌资源）
+src\core\                     通用基础库（utils / win_api / gui / net / assets）
 src\features\<功能域>\        功能模块，按功能域分目录
                               net / system / shell / personalize / account / license / tools
-src\os\                       按系统版本的优化实现（Xp / Vista7 / Win8 / Win10 / Win11 / Server）
+src\os\                       按系统版本的优化实现（common / xp / vista7 / win8 / win10 / win11 / server）
 src\file\                     运行时载荷（FileInstall 源）与本地 UDF
 src\img\                      图片与图标资源
 ```
 
+目录名与模块文件名一律小写，文件名不重复所在目录的名字（如 `src\core\utils.au3`）。
 模块职责、按系统版本分文件的对应关系、编译方法与维护注意事项见 [docs/模块结构.md](docs/模块结构.md)。
 
 ### 编译

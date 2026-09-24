@@ -32,91 +32,94 @@ BACKUP_SINGLE = os.path.join(BACKUP_DIR, 'WindowsNT6+快速设置工具.single-f
 
 # ---------------------------------------------------------------- 主流程分段
 APP_PARTS = [
-    ('src/app/App_Init.au3', 48, 264, '程序初始化',
+    ('src/app/init.au3', 48, 264, '程序初始化',
      '全局常量/变量、运行环境检测、加载动画、托盘菜单、单实例检查'),
-    ('src/app/App_MainWindow.au3', 265, 1121, '主窗口构建',
+    ('src/app/main_window.au3', 265, 1121, '主窗口构建',
      '主窗口及各选项卡控件的创建、控件事件绑定、初始数据装载'),
-    ('src/app/App_MainLoop.au3', 1122, 1147, '主循环',
+    ('src/app/main_loop.au3', 1122, 1147, '主循环',
      '窗口显示、输入框回调注册、定时器、消息循环'),
 ]
 
 # ---------------------------------------------------------------- 模块定义
 # 模块 id -> (输出路径, 标题, 说明)
 MODULES = OrderedDict()
+MODULE_PATHS = {}
 
-# 功能域 -> [(模块 id, 文件名, 标题, 说明), ...]
+# 功能域 -> [(模块 id, 文件名, 标题, 说明), ...]   文件名一律小写、不带目录名前缀
 FEATURE_DOMAINS = OrderedDict([
     ('net', ('网络', [
-        ('NetTools', 'Feat_NetTools', '网络工具', 'Winsock 重置、网络配置备份还原、时间同步、远程桌面端口、雨声白噪音、宽带连接创建'),
-        ('IpSet', 'Feat_IpSet', 'IP 地址设置', 'IP/DNS 静态与自动获取设置、方案管理、DNS 列表'),
-        ('MacChange', 'Feat_MacChange', 'MAC 修改与绑定', '网卡 MAC 地址修改、绑定、还原'),
-        ('WifiShare', 'Feat_WifiShare', 'Wifi 热点共享', '创建 Wifi 热点、ICS 共享设置'),
-        ('WOL', 'Feat_WOL', '网络唤醒', 'WOL 界面、魔术包生成与发送、计划任务'),
-        ('NCSI', 'Feat_NCSI', 'NCSI 服务器设置', '微软/火狐/Debian NCSI 探测服务器切换'),
+        ('NetTools', 'net_tools', '网络工具', 'Winsock 重置、网络配置备份还原、时间同步、远程桌面端口、雨声白噪音、宽带连接创建'),
+        ('IpSet', 'ip_set', 'IP 地址设置', 'IP/DNS 静态与自动获取设置、方案管理、DNS 列表'),
+        ('MacChange', 'mac_change', 'MAC 修改与绑定', '网卡 MAC 地址修改、绑定、还原'),
+        ('WifiShare', 'wifi_share', 'Wifi 热点共享', '创建 Wifi 热点、ICS 共享设置'),
+        ('WOL', 'wol', '网络唤醒', 'WOL 界面、魔术包生成与发送、计划任务'),
+        ('NCSI', 'ncsi', 'NCSI 服务器设置', '微软/火狐/Debian NCSI 探测服务器切换'),
     ])),
     ('system', ('系统优化', [
-        ('RegTweaks', 'Feat_RegTweaks', '注册表优化项', '常规优化选项卡中的各项注册表优化及其移除/还原；各版本实现见 src\\os'),
-        ('Plugins', 'Feat_Plugins', '系统插件补丁', 'Notepad2/HashTab/Everything/CCleaner 等插件的安装与移除'),
-        ('Services', 'Feat_Services', '系统服务与方案', 'Windows 服务优化方案（默认/极速/家用/个人&网吧）、主页设置'),
-        ('SSD', 'Feat_SSD', 'SSD 优化', 'SSD 节能、预读、休眠、系统还原、NTFS Journal 等开关'),
-        ('Security', 'Feat_Security', '系统安全设置', 'Windows 安全选项一键设置与还原'),
-        ('Cache', 'Feat_Cache', '缓存清理', '释放缓存、清理图标缓存'),
-        ('ProcessBL', 'Feat_ProcessBL', '进程黑名单', '禁止运行指定进程的黑名单管理'),
+        ('RegTweaks', 'reg_tweaks', '注册表优化项', '常规优化选项卡中的各项注册表优化及其移除/还原；各版本实现见 src\\os'),
+        ('Plugins', 'plugins', '系统插件补丁', 'Notepad2/HashTab/Everything/CCleaner 等插件的安装与移除'),
+        ('Services', 'services', '系统服务与方案', 'Windows 服务优化方案（默认/极速/家用/个人&网吧）、主页设置'),
+        ('SSD', 'ssd', 'SSD 优化', 'SSD 节能、预读、休眠、系统还原、NTFS Journal 等开关'),
+        ('Security', 'security', '系统安全设置', 'Windows 安全选项一键设置与还原'),
+        ('Cache', 'cache', '缓存清理', '释放缓存、清理图标缓存'),
+        ('ProcessBL', 'process_bl', '进程黑名单', '禁止运行指定进程的黑名单管理'),
     ])),
     ('shell', ('资源管理器与外壳', [
-        ('ExplorerMenu', 'Feat_ExplorerMenu', '资源管理器右键菜单', 'Win11 新旧右键菜单切换、小盾牌、Defender 右键项、重启资源管理器'),
-        ('ShellTweaks', 'Feat_ShellTweaks', '外壳微调', 'Win+X 菜单、新建文件默认名、注册表跳转'),
-        ('Share', 'Feat_Share', '共享与资源管理器', '一键共享开关、资源管理器目录管理、Win8.1 目录微调'),
-        ('DirTransfer', 'Feat_DirTransfer', '个人资料转移', '用户资料目录的转移、还原与目标盘选择'),
+        ('ExplorerMenu', 'explorer_menu', '资源管理器右键菜单', 'Win11 新旧右键菜单切换、小盾牌、Defender 右键项、重启资源管理器'),
+        ('ShellTweaks', 'shell_tweaks', '外壳微调', 'Win+X 菜单、新建文件默认名、注册表跳转'),
+        ('Share', 'share', '共享与资源管理器', '一键共享开关、资源管理器目录管理、Win8.1 目录微调'),
+        ('DirTransfer', 'dir_transfer', '个人资料转移', '用户资料目录的转移、还原与目标盘选择'),
     ])),
     ('personalize', ('个性化', [
-        ('OemInfo', 'Feat_OemInfo', 'OEM 信息与登录背景', '计算机所有者信息、品牌预设、OEM Logo、登录界面背景、工作组/环境变量'),
-        ('Wallpaper', 'Feat_Wallpaper', 'Bing 壁纸', '下载 Bing 每日壁纸'),
-        ('ScreenSaver', 'Feat_ScreenSaver', '屏保扩展包', 'Aerial / Fliqlo 屏保安装与设置'),
+        ('OemInfo', 'oem_info', 'OEM 信息与登录背景', '计算机所有者信息、品牌预设、OEM Logo、登录界面背景、工作组/环境变量'),
+        ('Wallpaper', 'wallpaper', 'Bing 壁纸', '下载 Bing 每日壁纸'),
+        ('ScreenSaver', 'screen_saver', '屏保扩展包', 'Aerial / Fliqlo 屏保安装与设置'),
     ])),
     ('account', ('账户与权限', [
-        ('UserAccount', 'Feat_UserAccount', '用户账户', '用户改名、描述、密码修改、自动登录设置'),
-        ('SysRun', 'Feat_SysRun', 'SYSTEM 权限运行', '以 SYSTEM 身份运行命令/程序'),
+        ('UserAccount', 'user_account', '用户账户', '用户改名、描述、密码修改、自动登录设置'),
+        ('SysRun', 'sys_run', 'SYSTEM 权限运行', '以 SYSTEM 身份运行命令/程序'),
     ])),
     ('license', ('激活与授权', [
-        ('Activation', 'Feat_Activation', '系统激活', 'BIOS/UEFI 激活、KMS、HWIDGen、OEM 证书备份与安装'),
+        ('Activation', 'activation', '系统激活', 'BIOS/UEFI 激活、KMS、HWIDGen、OEM 证书备份与安装'),
     ])),
     ('tools', ('实用工具', [
-        ('TrayTools', 'Feat_TrayTools', '托盘小工具', '一键集成/卸载的独立小工具（UPX、KClock、JunctionMaster、虚拟光驱、图标缓存等）'),
-        ('FileCreate', 'Feat_FileCreate', '批量创建文件', '创建指定大小的文件'),
-        ('DotNet', 'Feat_DotNet', '.NET Framework 3.5', '从安装介质安装 .NET 3.5'),
-        ('History', 'Feat_History', '版本记录与检查更新', '版本更新记录、在线检查新版本'),
-        ('Insider', 'Feat_Insider', 'Windows 预览体验计划', '预览体验计划通道切换与注册表配置'),
-        ('MkLink', 'Feat_MkLink', '符号链接工具', 'MkLink 图形界面封装'),
-        ('ForceDel', 'Feat_ForceDel', '文件强制删除', '无权限文件强制删除工具'),
-        ('TPHotkey', 'Feat_TPHotkey', 'ThinkPad 热键', 'ThinkPad 热键定义、X62 Intel 无线指示灯设置'),
+        ('TrayTools', 'tray_tools', '托盘小工具', '一键集成/卸载的独立小工具（UPX、KClock、JunctionMaster、虚拟光驱、图标缓存等）'),
+        ('FileCreate', 'file_create', '批量创建文件', '创建指定大小的文件'),
+        ('DotNet', 'dot_net', '.NET Framework 3.5', '从安装介质安装 .NET 3.5'),
+        ('History', 'history', '版本记录与检查更新', '版本更新记录、在线检查新版本'),
+        ('Insider', 'insider', 'Windows 预览体验计划', '预览体验计划通道切换与注册表配置'),
+        ('MkLink', 'mk_link', '符号链接工具', 'MkLink 图形界面封装'),
+        ('ForceDel', 'force_del', '文件强制删除', '无权限文件强制删除工具'),
+        ('TPHotkey', 'tp_hotkey', 'ThinkPad 热键', 'ThinkPad 热键定义、X62 Intel 无线指示灯设置'),
     ])),
 ])
 
 CORE_MODULES = [
-    ('Core_Utils', 'Core_Utils', '通用工具库', '字符串/数组/路径处理、系统与硬件信息探测、编解码等与业务无关的工具函数'),
-    ('Core_WinAPI', 'Core_WinAPI', 'WinAPI 底层封装', '权限提升、LSA、以 SYSTEM 身份运行、窗口消息过滤、鼠标按键等底层调用'),
-    ('Core_Gui', 'Core_Gui', 'GUI 辅助库', '窗口/控件创建封装、皮肤与悬停效果、托盘、消息回调、加载动画、全选反选'),
-    ('Core_Net', 'Core_Net', '网络底层库', 'IPHLPAPI 接口表、网卡信息、WMI 适配器枚举、流量统计'),
-    ('Core_Assets', 'Core_Assets', '内嵌资源库', '以 base64/LZNT 内嵌并还原 bmp/ico/exe/vbs 等资源（$bSaveBinary 系列）'),
+    ('Core_Utils', 'utils', '通用工具库', '字符串/数组/路径处理、系统与硬件信息探测、编解码等与业务无关的工具函数'),
+    ('Core_WinAPI', 'win_api', 'WinAPI 底层封装', '权限提升、LSA、以 SYSTEM 身份运行、窗口消息过滤、鼠标按键等底层调用'),
+    ('Core_Gui', 'gui', 'GUI 辅助库', '窗口/控件创建封装、皮肤与悬停效果、托盘、消息回调、加载动画、全选反选'),
+    ('Core_Net', 'net', '网络底层库', 'IPHLPAPI 接口表、网卡信息、WMI 适配器枚举、流量统计'),
+    ('Core_Assets', 'assets', '内嵌资源库', '以 base64/LZNT 内嵌并还原 bmp/ico/exe/vbs 等资源（$bSaveBinary 系列）'),
 ]
 
 # 按系统版本分文件的实现（由 tools/split_os_branches.py 生成）
 OS_MODULES = [
-    ('Os_Common.au3', 'Vista 及以后通用实现'),
-    ('Os_Xp.au3', 'Windows XP / 2003'),
-    ('Os_Vista7.au3', 'Vista / Win7 / 2008R2'),
-    ('Os_Win8.au3', 'Windows 8 / 8.1 / 2012'),
-    ('Os_Win10.au3', 'Windows 10'),
-    ('Os_Win11.au3', 'Windows 11'),
-    ('Os_Server.au3', 'Windows Server'),
+    ('common.au3', 'Vista 及以后通用实现'),
+    ('xp.au3', 'Windows XP / 2003'),
+    ('vista7.au3', 'Vista / Win7 / 2008R2'),
+    ('win8.au3', 'Windows 8 / 8.1 / 2012'),
+    ('win10.au3', 'Windows 10'),
+    ('win11.au3', 'Windows 11'),
+    ('server.au3', 'Windows Server'),
 ]
 
 for _mid, _fn, _title, _desc in CORE_MODULES:
-    MODULES['src/core/%s.au3' % _fn] = (_title, _desc)
+    MODULE_PATHS[_mid] = 'src/core/%s.au3' % _fn
+    MODULES[MODULE_PATHS[_mid]] = (_title, _desc)
 for _dom, (_dom_title, _items) in FEATURE_DOMAINS.items():
     for _mid, _fn, _title, _desc in _items:
-        MODULES['src/features/%s/%s.au3' % (_dom, _fn)] = (_title, _desc)
+        MODULE_PATHS[_mid] = 'src/features/%s/%s.au3' % (_dom, _fn)
+        MODULES[MODULE_PATHS[_mid]] = (_title, _desc)
 
 # ---------------------------------------------------------------- 函数归属表
 FUNC_MAP = {}
@@ -395,21 +398,32 @@ ENDFUNC_RE = re.compile(r'^\s*EndFunc')
 
 
 def module_path(module_id):
-    for path in MODULES:
-        if os.path.basename(path).startswith(module_id.replace('Core_', 'Core_')):
-            pass
-    for path in MODULES:
-        base = os.path.basename(path)
-        if base == module_id + '.au3' or base == 'Feat_' + module_id + '.au3':
-            return path
-    raise SystemExit('找不到模块路径: %s' % module_id)
+    try:
+        return MODULE_PATHS[module_id]
+    except KeyError:
+        raise SystemExit('找不到模块路径: %s' % module_id)
 
 
 def read_source():
-    """优先读取备份的单文件原始脚本（入口文件是本脚本的产物，重复执行时不能再作为输入）。"""
-    src = BACKUP_SINGLE if os.path.exists(BACKUP_SINGLE) else SRC
-    if src != SRC:
-        print('源文件：%s（备份的单文件原始脚本）' % os.path.relpath(src, ROOT))
+    """读取原始单文件脚本。
+
+    入口文件是本脚本的产物，不能作为输入，因此需要显式指定原始单文件脚本：
+        python tools/split_modules.py --source <原始单文件脚本>
+    未指定时，若 backup 目录下仍保留单文件快照则自动使用。
+    """
+    src = None
+    if '--source' in sys.argv:
+        src = sys.argv[sys.argv.index('--source') + 1]
+        if not os.path.isabs(src):
+            src = os.path.join(ROOT, src)
+    elif os.path.exists(BACKUP_SINGLE):
+        src = BACKUP_SINGLE
+    if not src or not os.path.exists(src):
+        raise SystemExit(
+            '找不到原始单文件脚本。请用 --source 指定，例如：\n'
+            '    git show cbe39cb:"WindowsNT6+快速设置工具.au3" > 原始单文件.au3\n'
+            '    python tools/split_modules.py --source 原始单文件.au3')
+    print('源文件：%s' % os.path.relpath(src, ROOT))
     with io.open(src, 'rb') as f:
         raw = f.read()
     return raw.decode('utf-8-sig').splitlines(keepends=True)
@@ -551,13 +565,6 @@ def main():
     if check_only:
         print('校验通过（--check 模式，未写文件）')
         return
-
-    if not os.path.isdir(BACKUP_DIR):
-        os.makedirs(BACKUP_DIR)
-    backup = os.path.join(BACKUP_DIR, 'WindowsNT6+快速设置工具.single-file.au3')
-    if not os.path.exists(backup):
-        with io.open(backup, 'wb') as f:
-            f.write(io.open(SRC, 'rb').read())
 
     def write_out(rel, lines_out):
         full = os.path.join(ROOT, rel.replace('/', os.sep))
